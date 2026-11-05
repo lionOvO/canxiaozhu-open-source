@@ -1,0 +1,14 @@
+{
+  "slideStyle": "Tech",
+  "colorScheme": "Tech Business Style",
+  "primaryColor": "#1E3A5F",
+  "accentColor1": "#FF6B35",
+  "accentColor2": "#00C853",
+  "neutralColor": "#5F6368",
+  "background": {
+    "type": "gradient",
+    "value": "linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%)"
+  },
+  "fontTitle": "'Montserrat', 'Noto Sans SC', sans-serif",
+  "fontBody": "'Inter', 'Noto Sans SC', sans-serif"
+}

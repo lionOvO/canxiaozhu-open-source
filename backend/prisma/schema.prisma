@@ -1,0 +1,424 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Initialized additively by KnowledgeService for existing installations.
+model AgentKnowledgeDocument {
+  id             String @id
+  shopId         Int
+  title          String
+  category       String
+  version        String
+  sourceName     String
+  effectiveFrom  String
+  effectiveUntil String?
+  status         String @default("active")
+  chunkCount     Int
+  content        String
+  chunksJson     String
+  createdAt      String
+  updatedAt      String
+  shop           Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  embeddings     AgentKnowledgeEmbedding[]
+
+  @@index([shopId, status])
+}
+
+model AgentKnowledgeEmbedding {
+  documentId  String
+  chunkIndex  Int
+  fingerprint String
+  textHash    String
+  vectorJson  String
+  createdAt   String
+  document    AgentKnowledgeDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@id([documentId, chunkIndex, fingerprint])
+}
+
+model Shop {
+  members        ShopMember[]
+  invitations    ShopInvitation[]
+  id             Int                       @id
+  name           String
+  brand          String
+  city           String
+  businessHours  String
+  unreadCount    Int
+  realtimeOrders Int
+  statusTone     String
+  dashboard      DashboardSnapshot?
+  reports        DailyReportSnapshot[]
+  customers      CustomerProfileSnapshot[]
+  dishQuadrants  DishQuadrantSnapshot[]
+  purchaseOrders PurchaseOrder[]
+  reviews        Review[]
+  systemConfig   SystemConfigSnapshot?
+  todoStates     TodoState[]
+  couponLogs     CouponSendLog[]
+  inventoryLogs  InventoryActionLog[]
+  inventoryItems InventoryItem[]
+  inventoryTransactions InventoryTransaction[]
+  voiceLogs      VoiceQuestionLog[]
+  diningTables   DiningTable[]
+  menuItems      MenuItem[]
+  knowledgeDocuments AgentKnowledgeDocument[]
+  diningOrders   DiningOrder[]
+}
+
+model MerchantUser {
+  memberships     ShopMember[]
+  id              String          @id @default(cuid())
+  account         String          @unique
+  email           String?
+  phone           String?
+  wechatOpenId    String?         @unique
+  wechatUnionId   String?         @unique
+  wechatNickname  String?
+  wechatAvatar    String?
+  displayName     String
+  role            String
+  phoneMask       String?
+  passwordHash    String
+  passwordSalt    String
+  status          String          @default("active")
+  assignedShopIds Json
+  defaultShopId   Int
+  lastLoginAt     DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  sessions        AuthSession[]
+  loginLogs       LoginAuditLog[]
+
+  @@index([email])
+  @@index([phone])
+}
+
+model ShopMember {
+  shopId Int
+  userId String
+  role String
+  status String @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  user MerchantUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@id([shopId, userId])
+  @@index([userId, status])
+}
+
+model ShopInvitation {
+  id String @id
+  shopId Int
+  role String
+  codeHash String @unique
+  createdBy String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  revokedAt DateTime?
+  usedAt DateTime?
+  usedBy String?
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  @@index([shopId, createdAt])
+}
+
+model MembershipMigration {
+  userId String @id
+}
+
+model PermissionAudit {
+  id String @id
+  actorId String
+  shopId Int
+  action String
+  target String
+  createdAt DateTime @default(now())
+  @@index([shopId, createdAt])
+}
+
+model AuthSession {
+  id         String       @id @default(cuid())
+  userId     String
+  tokenHash  String       @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime     @default(now())
+  lastSeenAt DateTime     @default(now())
+  user       MerchantUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model LoginAuditLog {
+  id        String        @id @default(cuid())
+  userId    String?
+  account   String
+  ip        String?
+  userAgent String?
+  success   Boolean
+  reason    String?
+  createdAt DateTime      @default(now())
+  user      MerchantUser? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model DashboardSnapshot {
+  shopId      Int      @id
+  payload     Json
+  lastSyncAt  DateTime
+  generatedAt DateTime @default(now())
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+model DailyReportSnapshot {
+  id         String   @id
+  shopId      Int
+  reportDate  DateTime
+  payload     Json
+  createdAt   DateTime @default(now())
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@unique([shopId, reportDate])
+}
+
+model CustomerProfileSnapshot {
+  customerId Int    @id
+  shopId     Int
+  name       String
+  payload    Json
+  updatedAt  DateTime @updatedAt
+  shop       Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  couponLogs CouponSendLog[]
+}
+
+model DishQuadrantSnapshot {
+  id        String   @id
+  shopId     Int
+  period     Int
+  payload    Json
+  updatedAt  DateTime @updatedAt
+  shop       Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@unique([shopId, period])
+}
+
+model PurchaseOrder {
+  id              String   @id
+  shopId          Int
+  forecastDate    DateTime
+  basedOn         String
+  status          String
+  confidence      Int
+  aiNote          String
+  expireAlert     String?
+  totalAmount     Float
+  payload         Json
+  baselinePayload Json
+  updatedAt       DateTime @updatedAt
+  shop            Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  exportLogs      ExportLog[]
+}
+
+model Review {
+  id           String   @id
+  shopId       Int
+  platform     String
+  rating       Int
+  category     String
+  content      String
+  createdAt    DateTime
+  customerName String
+  sentiment    String
+  aiReply      String
+  highlighted  Boolean
+  replyUrl     String?
+  handled      Boolean  @default(false)
+  shop         Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+model ChainBoardSnapshot {
+  id         Int      @id @default(1)
+  payload    Json
+  comparedAt DateTime
+  updatedAt  DateTime @updatedAt
+}
+
+model SystemConfigSnapshot {
+  shopId    Int      @id
+  payload   Json
+  updatedAt DateTime @updatedAt
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+model TodoState {
+  todoId     String   @id
+  shopId      Int
+  dismissed   Boolean  @default(false)
+  updatedAt   DateTime @updatedAt
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+model CouponSendLog {
+  id         String   @id @default(cuid())
+  shopId     Int
+  customerId Int
+  couponName String
+  channel    String
+  scenario   String
+  status     String
+  createdAt  DateTime @default(now())
+  shop       Shop                    @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  customer   CustomerProfileSnapshot @relation(fields: [customerId], references: [customerId], onDelete: Cascade)
+}
+
+model InventoryActionLog {
+  id         String   @id @default(cuid())
+  shopId      Int
+  ingredient  String
+  action      String
+  status      String
+  createdAt   DateTime @default(now())
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+model InventoryItem {
+  id             String                @id @default(cuid())
+  shopId         Int
+  ingredient     String
+  unit           String
+  currentQty     Float                 @default(0)
+  inTransitQty   Float                 @default(0)
+  reorderLevel   Float                 @default(0)
+  unitCost       Float                 @default(0)
+  supplier       String?
+  isCounted      Boolean               @default(false)
+  lastCountedAt  DateTime?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  shop           Shop                  @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  transactions   InventoryTransaction[]
+
+  @@unique([shopId, ingredient])
+  @@index([shopId, updatedAt])
+}
+
+model InventoryTransaction {
+  id              String        @id @default(cuid())
+  shopId          Int
+  inventoryItemId String
+  type            String
+  quantity        Float
+  onHandDelta     Float         @default(0)
+  inTransitDelta  Float         @default(0)
+  onHandAfter     Float
+  inTransitAfter  Float
+  referenceKey    String?       @unique
+  referenceType   String?
+  referenceId     String?
+  note            String?
+  createdAt       DateTime      @default(now())
+  shop            Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+
+  @@index([shopId, createdAt])
+  @@index([inventoryItemId, createdAt])
+}
+
+model ExportLog {
+  id              String   @id @default(cuid())
+  purchaseOrderId String
+  type            String
+  requestedBy     String
+  createdAt       DateTime @default(now())
+  status          String
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+}
+
+model VoiceQuestionLog {
+  id         String   @id @default(cuid())
+  shopId      Int
+  question    String
+  answer      String
+  provider    String
+  confidence  Float
+  createdAt   DateTime @default(now())
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+model DiningTable {
+  id          String        @id @default(cuid())
+  shopId      Int
+  tableNo     String
+  seatCount   Int           @default(4)
+  qrToken     String        @unique
+  status      String        @default("active")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  shop        Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  orders      DiningOrder[]
+
+  @@unique([shopId, tableNo])
+  @@index([shopId])
+}
+
+model MenuItem {
+  id          String            @id @default(cuid())
+  shopId      Int
+  name        String
+  category    String
+  price       Float
+  cost        Float             @default(0)
+  description String?
+  imageUrl    String?
+  status      String            @default("available")
+  sortOrder   Int               @default(0)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  shop        Shop              @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  orderItems  DiningOrderItem[]
+
+  @@index([shopId, status])
+}
+
+model DiningOrder {
+  id             String            @id @default(cuid())
+  orderNo        String            @unique
+  shopId         Int
+  tableId        String
+  tableNo        String
+  customerPhone  String?
+  customerName   String?
+  remark         String?
+  peopleCount    Int               @default(1)
+  subtotal       Float
+  totalAmount    Float
+  status         String            @default("pending")
+  paymentStatus  String            @default("unpaid")
+  source         String            @default("table_qr")
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  shop           Shop              @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  table          DiningTable       @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  items          DiningOrderItem[]
+
+  @@index([shopId, createdAt])
+  @@index([shopId, status])
+}
+
+model DiningOrderItem {
+  id         String      @id @default(cuid())
+  orderId    String
+  menuItemId String
+  name       String
+  quantity   Int
+  unitPrice  Float
+  amount     Float
+  remark     String?
+  order      DiningOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem   MenuItem    @relation(fields: [menuItemId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([menuItemId])
+}

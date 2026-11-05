@@ -1,0 +1,28 @@
+:root {
+  --app-max-width: 430px;
+
+  --bg-page: #f7f1ea;
+  --bg-glow: rgba(255, 184, 122, 0.18);
+  --surface: rgba(255, 255, 255, 0.86);
+  --surface-strong: rgba(255, 255, 255, 0.94);
+  --surface-soft: rgba(250, 244, 239, 0.84);
+
+  --accent: #ff6b35;
+  --accent-strong: #db5424;
+  --accent-soft: rgba(255, 107, 53, 0.12);
+  --success: #1e9d63;
+  --warning: #e48d21;
+  --danger: #d84d43;
+  --neutral: #7c6651;
+
+  --text-main: #2b1d14;
+  --text-soft: #6b5646;
+  --text-muted: #927b68;
+
+  --line-soft: rgba(126, 92, 62, 0.12);
+  --shadow-card: 0 18px 34px rgba(90, 48, 17, 0.08);
+  --shadow-floating: 0 20px 38px rgba(49, 27, 12, 0.18);
+
+  --font-display: 'STZhongsong', 'Noto Serif SC', 'Songti SC', serif;
+  --font-body: 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}

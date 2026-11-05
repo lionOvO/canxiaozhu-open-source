@@ -1,0 +1,1043 @@
+import { PrismaClient } from '@prisma/client'
+import type {
+  ChainBoardData,
+  CustomerProfile,
+  DailyReportData,
+  DashboardData,
+  DishQuadrantData,
+  PurchaseOrderData,
+  ReviewAggregateData,
+  SystemConfigData,
+} from '../src/domain/types.js'
+
+const prisma = new PrismaClient()
+
+const shops = [
+  {
+    id: 3001,
+    name: '老王快餐（幸福路店）',
+    brand: '老王快餐',
+    city: '上海',
+    businessHours: '06:30 - 21:00',
+    unreadCount: 4,
+    realtimeOrders: 28,
+    statusTone: 'warning',
+  },
+  {
+    id: 3002,
+    name: '老王快餐（长宁店）',
+    brand: '老王快餐',
+    city: '上海',
+    businessHours: '07:00 - 22:00',
+    unreadCount: 1,
+    realtimeOrders: 19,
+    statusTone: 'success',
+  },
+  {
+    id: 3003,
+    name: '轻食实验室（静安店）',
+    brand: '轻食实验室',
+    city: '上海',
+    businessHours: '09:00 - 20:30',
+    unreadCount: 3,
+    realtimeOrders: 14,
+    statusTone: 'danger',
+  },
+] as const
+
+const dashboard3001: DashboardData = {
+  weather: {
+    condition: '小雨',
+    temperature: 28,
+    tip: '今天有雨，外卖预计多15%，建议提前备好打包盒。',
+  },
+  operationLabel: '有2条异常待处理',
+  operationTone: 'warning',
+  profit: 1120,
+  revenue: 3680,
+  orders: 112,
+  averageTicket: 32.9,
+  profitDelta: 12,
+  aiHeadline: 'AI经营日报已生成',
+  aiSummary: '昨天利润基本健康，但绿叶菜损耗偏高，午市客单价有小幅回落。',
+  reportHasAlert: true,
+  quickEntries: [
+    {
+      key: 'customers',
+      title: '客户资产',
+      subtitle: '本月新增23人，3人待召回',
+      route: '/customers/1001',
+      status: '3人待处理',
+      statusTone: 'warning',
+    },
+    {
+      key: 'dishes',
+      title: '菜品盈利',
+      subtitle: '1道淘汰菜建议下架',
+      route: '/dishes',
+      status: '菜单待优化',
+      statusTone: 'warning',
+    },
+    {
+      key: 'purchase',
+      title: '采购单',
+      subtitle: '明日采购单已生成',
+      route: '/purchase',
+      status: '待确认',
+      statusTone: 'danger',
+    },
+    {
+      key: 'reviews',
+      title: '评价口碑',
+      subtitle: '1条差评待回复',
+      route: '/reviews',
+      status: '差评预警',
+      statusTone: 'danger',
+    },
+  ],
+  trendSeries: [
+    {
+      key: 'grossMargin',
+      label: '毛利率',
+      unit: '%',
+      values: [52, 54, 55, 56, 55, 55, 57],
+      anomalies: [0],
+      insight: '毛利率连续3天稳定在55%左右，当前套餐结构可以继续保留。',
+    },
+    {
+      key: 'averageTicket',
+      label: '客单价',
+      unit: '元',
+      values: [36, 35, 34, 33, 33, 32.5, 32.9],
+      anomalies: [5],
+      insight: '午市客单价轻微下探，建议把高毛利加配放回点单第一页。',
+    },
+    {
+      key: 'repurchaseRate',
+      label: '复购率',
+      unit: '%',
+      values: [18, 19, 20, 22, 23, 23, 25],
+      anomalies: [],
+      insight: '召回券开始见效，近7天复购率较上周抬升4.6个百分点。',
+    },
+    {
+      key: 'wasteRate',
+      label: '损耗率',
+      unit: '%',
+      values: [8, 8.5, 9.4, 10.2, 11.6, 12.3, 10.8],
+      anomalies: [4, 5],
+      insight: '绿叶菜损耗仍高于正常值，建议改成分批补货并设置今日特价菜。',
+    },
+  ],
+  todos: [
+    {
+      id: 'todo-1',
+      module: '采购',
+      title: '今日采购单待确认，鱼片建议量置信度 82%',
+      actionLabel: '去确认',
+      route: '/purchase',
+      confidence: 82,
+      dueHint: '10:30前',
+      tone: 'danger',
+    },
+    {
+      id: 'todo-2',
+      module: '客户',
+      title: '张先生30天未消费，建议发满50减5券',
+      actionLabel: '去召回',
+      route: '/customers/1001',
+      confidence: 65,
+      dueHint: '午市前',
+      tone: 'warning',
+    },
+    {
+      id: 'todo-3',
+      module: '库存',
+      title: '上海青2kg将在24小时后过期，建议做今日特价',
+      actionLabel: '去处理',
+      route: '/purchase',
+      confidence: 88,
+      dueHint: '全天',
+      tone: 'warning',
+    },
+    {
+      id: 'todo-4',
+      module: '评价',
+      title: '美团1条差评待回复，草稿已生成',
+      actionLabel: '去回复',
+      route: '/reviews',
+      confidence: 91,
+      dueHint: '1小时内',
+      tone: 'danger',
+    },
+  ],
+  lastSyncAt: '2026-08-05T08:02:00+08:00',
+}
+
+const dailyReport3001: DailyReportData = {
+  date: '2026-08-04',
+  summary: '昨天整体利润守住了，但午市客单价偏软、叶菜损耗偏高，今天重点盯采购和加购。',
+  metrics: [
+    { label: '营收', value: 3680, unit: 'currency', hint: '环比 +12.0%' },
+    { label: '真实利润', value: 1120, unit: 'currency', hint: '利润率 30.4%' },
+    { label: '订单量', value: 112, unit: 'count', hint: '外卖占比 63%' },
+    { label: '客单价', value: 32.9, unit: 'currency', hint: '较上周 -4.2%' },
+  ],
+  revenueTrend: [3200, 3360, 3480, 3510, 3590, 3620, 3680],
+  profitTrend: [920, 980, 1010, 1035, 1050, 1090, 1120],
+  topDishes: [
+    { name: '酸菜鱼', sales: 36, profit: 912 },
+    { name: '红烧肉饭', sales: 24, profit: 468 },
+    { name: '干锅土豆片', sales: 19, profit: 226 },
+  ],
+  abnormalities: [
+    {
+      title: '退单率偏高',
+      delta: '6.2%',
+      reason: '晚高峰外卖打包盒缺货，配送超时投诉增加。',
+      advice: '今天中午前补足大号打包盒，并把晚高峰备盒量上调20%。',
+      confidence: '高',
+    },
+    {
+      title: '绿叶菜损耗率超阈值',
+      delta: '13.0%',
+      reason: '上海青连续两天备货偏多，且昨日小雨导致堂食下滑。',
+      advice: '采购改为分两次补货，今天把上海青转成员工餐或特价菜。',
+      confidence: '高',
+    },
+    {
+      title: '午市客单价波动',
+      delta: '-8.5%',
+      reason: '高毛利配菜曝光位置下降，单点集中在低价快餐。',
+      advice: '把卤蛋、酸梅汤恢复到点单第一页，推9.9元加购。',
+      confidence: '中',
+    },
+  ],
+  weatherTip: '今天上海小雨，预计外卖占比继续提升，提前备好防洒包装和骑手取餐通道。',
+  customerSummary: {
+    newCustomers: 11,
+    churnRiskCustomers: 3,
+    memberConversion: 24,
+  },
+  actionSuggestions: [
+    '午市前处理上海青临期库存，优先做今日特价和员工餐。',
+    '对30天未消费的高价值客户发满50减5券，重点拉回晚餐常客。',
+    '把高毛利加购恢复到菜单前两屏，抬回午市客单价。',
+  ],
+  voiceScript:
+    '昨天营收三千六百八十元，真实利润一千一百二十元。重点问题是绿叶菜损耗偏高和退单率略高，今天先处理采购和包装。',
+}
+
+const customers3001: CustomerProfile[] = [
+  {
+    id: 1001,
+    name: '张先生',
+    phoneMask: '138****5678',
+    avatarSeed: '张',
+    memberLevel: '银卡会员',
+    rfmSegment: '重要价值客',
+    statusLabels: ['活跃', '30天未消费', '流失风险'],
+    totalSpend: 3260,
+    totalOrders: 48,
+    averageTicket: 67.9,
+    lastOrderDays: 32,
+    tags: [
+      {
+        id: 'tag-1',
+        name: '会员客户',
+        category: 'basic',
+        definition: '已加入门店会员体系，适合做权益触达。',
+        rule: 'is_member = 1',
+      },
+      {
+        id: 'tag-2',
+        name: '晚餐常客',
+        category: 'preference',
+        definition: '晚餐时段订单占比超过50%。',
+        rule: '晚餐订单占比 > 50%',
+      },
+      {
+        id: 'tag-3',
+        name: '爱吃辣',
+        category: 'preference',
+        definition: '辣度偏好分高于6。',
+        rule: 'preference_spiciness > 6',
+      },
+      {
+        id: 'tag-4',
+        name: '雨天点外卖',
+        category: 'behavior',
+        definition: '雨天订单中外卖占比超过80%。',
+        rule: '雨天外卖占比 > 80%',
+      },
+      {
+        id: 'tag-5',
+        name: '高价值客户',
+        category: 'value',
+        definition: 'RFM评分高且利润贡献位于前10%。',
+        rule: 'RFM >= 12 且 利润贡献 TOP10%',
+      },
+      {
+        id: 'tag-6',
+        name: '流失风险客户',
+        category: 'value',
+        definition: '30天以上未消费，流失风险分偏高。',
+        rule: 'churn_risk_score > 0.6',
+      },
+    ],
+    preferenceVector: {
+      spicy: 7,
+      sweet: 2,
+      light: 4,
+      salty: 8,
+      sour: 7,
+    },
+    preferenceSummary: '张先生偏好中辣、偏咸鲜，不爱甜口，适合酸菜鱼和带锅气的招牌菜。',
+    allergies: ['花生', '海鲜'],
+    orderHistory: [
+      {
+        id: 'order-1',
+        time: '2026-08-04T18:45:00+08:00',
+        platform: '美团',
+        dishes: '酸菜鱼 + 干锅土豆片',
+        amount: 68,
+        rating: 5,
+      },
+      {
+        id: 'order-2',
+        time: '2026-07-28T19:10:00+08:00',
+        platform: '饿了么',
+        dishes: '红烧肉饭 + 卤蛋',
+        amount: 43,
+        rating: 4,
+      },
+      {
+        id: 'order-3',
+        time: '2026-07-18T18:22:00+08:00',
+        platform: '堂食',
+        dishes: '酸菜鱼 + 冰粉',
+        amount: 88,
+        rating: 5,
+      }
+    ],
+    recallSuggestion: {
+      summary: '张先生已30天未消费，历史客单价68元，偏好酸菜鱼和辣味，适合用低成本的晚餐券先把他叫回来。',
+      couponName: '满50减5元晚餐券',
+      expectedRecallRate: 65,
+      expectedCost: 5,
+      expectedRevenue: 44,
+      confidence: '中',
+    },
+    notes: ['每次来都带孩子', '不吃香菜', '愿意尝试新品但不喜欢太甜'],
+    manualTags: ['家庭客', '回访优先'],
+    churnRiskScore: 0.68,
+  },
+  {
+    id: 1002,
+    name: '李女士',
+    phoneMask: '139****9021',
+    avatarSeed: '李',
+    memberLevel: '普通会员',
+    rfmSegment: '一般价值客',
+    statusLabels: ['活跃', '堂食党'],
+    totalSpend: 1180,
+    totalOrders: 22,
+    averageTicket: 53.6,
+    lastOrderDays: 4,
+    tags: [],
+    preferenceVector: {
+      spicy: 3,
+      sweet: 6,
+      light: 7,
+      salty: 4,
+      sour: 5,
+    },
+    preferenceSummary: '偏清淡，偶尔加甜品，是典型午餐堂食客。',
+    allergies: [],
+    orderHistory: [],
+    recallSuggestion: {
+      summary: '当前客户活跃，无需召回，适合做会员升档。',
+      couponName: '升级会员送饮品',
+      expectedRecallRate: 0,
+      expectedCost: 0,
+      expectedRevenue: 0,
+      confidence: '高',
+    },
+    notes: ['工作日午餐到店频繁'],
+    manualTags: ['午市核心'],
+    churnRiskScore: 0.12,
+  },
+  {
+    id: 1003,
+    name: '周先生',
+    phoneMask: '137****1138',
+    avatarSeed: '周',
+    memberLevel: '金卡会员',
+    rfmSegment: '重要发展客',
+    statusLabels: ['新品尝鲜', '价格敏感'],
+    totalSpend: 1820,
+    totalOrders: 27,
+    averageTicket: 67.4,
+    lastOrderDays: 8,
+    tags: [],
+    preferenceVector: {
+      spicy: 5,
+      sweet: 4,
+      light: 5,
+      salty: 5,
+      sour: 4,
+    },
+    preferenceSummary: '口味均衡，愿意尝试新品，但对优惠活动反应明显。',
+    allergies: [],
+    orderHistory: [],
+    recallSuggestion: {
+      summary: '适合在新品上新时推尝鲜券。',
+      couponName: '新品试吃券',
+      expectedRecallRate: 42,
+      expectedCost: 8,
+      expectedRevenue: 56,
+      confidence: '中',
+    },
+    notes: ['常和同事拼单'],
+    manualTags: ['新品优先'],
+    churnRiskScore: 0.33,
+  },
+]
+
+const dishQuadrant3001: DishQuadrantData = {
+  period: 30,
+  quadrants: {
+    star: [
+      { id: 1, name: '酸菜鱼', salesPercentile: 0.86, profitPercentile: 0.9, monthlySales: 320, grossProfitRate: 68, label: '招牌' },
+      { id: 2, name: '红烧肉饭', salesPercentile: 0.81, profitPercentile: 0.72, monthlySales: 240, grossProfitRate: 54, label: '走量' },
+    ],
+    traffic: [
+      { id: 3, name: '番茄鸡蛋饭', salesPercentile: 0.77, profitPercentile: 0.48, monthlySales: 210, grossProfitRate: 38, label: '引流' },
+    ],
+    profit: [
+      { id: 4, name: '冰粉', salesPercentile: 0.44, profitPercentile: 0.78, monthlySales: 118, grossProfitRate: 71, label: '高毛利' },
+      { id: 5, name: '酸梅汤', salesPercentile: 0.52, profitPercentile: 0.82, monthlySales: 132, grossProfitRate: 75, label: '加购' },
+    ],
+    eliminate: [
+      { id: 6, name: '青椒土豆丝', salesPercentile: 0.22, profitPercentile: 0.24, monthlySales: 36, grossProfitRate: 28, label: '待淘汰' },
+    ],
+  },
+  suggestions: [
+    '酸菜鱼继续做门面，把菜单首屏保留招牌与高毛利饮品联动。',
+    '番茄鸡蛋饭是引流菜，建议和卤蛋打包成轻加购套餐。',
+    '青椒土豆丝销量和毛利都弱，建议缩减曝光位或改成员工餐。',
+  ],
+  basketInsights: [
+    '酸菜鱼与冰粉、酸梅汤共现率最高，适合做“重口+解腻”套餐。',
+    '红烧肉饭与卤蛋的搭配稳定，可做午市快捷套餐提升客单。',
+  ],
+  menuRecommendations: [
+    '把高毛利饮品和卤蛋前置到菜单前两屏。',
+    '晚餐菜单优先展示酸菜鱼和双人套餐，午餐侧重单人快餐。',
+  ],
+  costAlerts: [
+    {
+      ingredient: '鱼片',
+      change: '+6.8%',
+      advice: '若本周继续上涨，建议把酸菜鱼售价上调1元并同步强调份量。',
+    },
+    {
+      ingredient: '包装盒',
+      change: '+5.2%',
+      advice: '可将外卖高峰套餐打包方式统一，减少包装规格。',
+    },
+  ],
+}
+
+const purchaseOrder3001: PurchaseOrderData = {
+  id: 'PO-20260806-3001',
+  forecastDate: '2026-08-06',
+  basedOn: '基于过去90天销量、天气预报与当前库存生成',
+  totalAmount: 1250,
+  status: '待确认',
+  confidence: 82,
+  aiNote: '明日预计订单128单，较今日增加14%。雨天外卖增加，建议鱼片多备2kg；绿叶菜损耗高，建议分两次采购。',
+  expireAlert: '上海青 2kg 将在24小时后过期，建议今日做特价菜或员工餐。',
+  items: [
+    { id: 'item-1', ingredient: '鱼片', suggestedQty: 14, unit: 'kg', unitPrice: 28, amount: 392, confidence: 82, supplier: 'A供应商', supplierOptions: ['A供应商', 'B供应商'] },
+    { id: 'item-2', ingredient: '上海青', suggestedQty: 8, unit: 'kg', unitPrice: 4.5, amount: 36, confidence: 65, supplier: 'B供应商', supplierOptions: ['B供应商', 'C供应商'] },
+    { id: 'item-3', ingredient: '五花肉', suggestedQty: 10, unit: 'kg', unitPrice: 22, amount: 220, confidence: 78, supplier: 'A供应商', supplierOptions: ['A供应商', 'C供应商'] },
+    { id: 'item-4', ingredient: '酸菜', suggestedQty: 6, unit: 'kg', unitPrice: 5, amount: 30, confidence: 80, supplier: 'C供应商', supplierOptions: ['C供应商', 'A供应商'] },
+    { id: 'item-5', ingredient: '大米', suggestedQty: 25, unit: 'kg', unitPrice: 3.5, amount: 87.5, confidence: 90, supplier: 'A供应商', supplierOptions: ['A供应商', 'B供应商'] },
+    { id: 'item-6', ingredient: '打包盒', suggestedQty: 120, unit: '个', unitPrice: 1.2, amount: 144, confidence: 86, supplier: 'B供应商', supplierOptions: ['B供应商', 'C供应商'] },
+    { id: 'item-7', ingredient: '卤蛋', suggestedQty: 80, unit: '个', unitPrice: 2.1, amount: 168, confidence: 74, supplier: 'A供应商', supplierOptions: ['A供应商', 'B供应商'] },
+    { id: 'item-8', ingredient: '酸梅汤原液', suggestedQty: 6, unit: '桶', unitPrice: 21, amount: 126, confidence: 71, supplier: 'B供应商', supplierOptions: ['B供应商', 'C供应商'] },
+  ],
+  supplierComparisons: [
+    { supplier: 'A供应商', reasons: ['鱼片、五花肉品质稳定', '近7天退货率 0%', '晨间配送最准时'], priceAdvantage: '综合稳定性最高' },
+    { supplier: 'B供应商', reasons: ['上海青今日特价', '打包盒单价低 0.2 元/个', '支持中午二次补货'], priceAdvantage: '临期与耗材价格最好' },
+    { supplier: 'C供应商', reasons: ['酸菜口味稳定', '可与绿叶菜拼单送达'], priceAdvantage: '适合少量补货' },
+  ],
+}
+
+const reviewAggregateKeywords = ['锅气足', '酸菜鱼', '出餐快', '分量足', '包装漏汤']
+
+const reviews3001: ReviewAggregateData = {
+  averageRating: 4.6,
+  totalCount: 126,
+  badReviewCount: 7,
+  keywords: reviewAggregateKeywords,
+  categoryDistribution: [
+    { category: '口味', percent: 42 },
+    { category: '配送', percent: 24 },
+    { category: '服务', percent: 18 },
+    { category: '异物', percent: 6 },
+    { category: '其他', percent: 10 },
+  ],
+  reviews: [
+    {
+      id: 'review-1',
+      platform: '美团',
+      rating: 2,
+      content: '味道还行，但汤洒了，包装太软，骑手送到时袋子都湿了。',
+      category: '配送',
+      createdAt: '2026-08-05T09:10:00+08:00',
+      customerName: '匿名用户',
+      sentiment: 'negative',
+      aiReply: '抱歉让您这次吃得不顺心。我们已经把这条反馈同步给门店，今天会更换加厚打包盒并复盘封口流程。若方便，欢迎联系门店，我们补您一份到店或外卖补偿。',
+      highlighted: true,
+      handled: false,
+      replyUrl: 'https://example.com/reviews/meituan/review-1',
+    },
+    {
+      id: 'review-2',
+      platform: '饿了么',
+      rating: 5,
+      content: '酸菜鱼还是稳，锅气很足，送到也快。',
+      category: '口味',
+      createdAt: '2026-08-05T08:20:00+08:00',
+      customerName: '张先生',
+      sentiment: 'positive',
+      aiReply: '感谢夸奖，酸菜鱼会继续保持锅气和热度，欢迎下次继续来吃。',
+      highlighted: false,
+      handled: false,
+      replyUrl: 'https://example.com/reviews/eleme/review-2',
+    },
+    {
+      id: 'review-3',
+      platform: '大众点评',
+      rating: 3,
+      content: '红烧肉饭味道不错，就是配菜有点少。',
+      category: '口味',
+      createdAt: '2026-08-04T19:20:00+08:00',
+      customerName: '周先生',
+      sentiment: 'neutral',
+      aiReply: '谢谢您点得这么认真。我们已经提醒后厨检查配菜标准，保证下次份量更稳定，也欢迎您直接和门店说，我们会第一时间调整。',
+      highlighted: false,
+      handled: false,
+      replyUrl: 'https://example.com/reviews/dianping/review-3',
+    },
+    {
+      id: 'review-4',
+      platform: '抖音',
+      rating: 1,
+      content: '包装里有点漏油，影响观感。',
+      category: '异物',
+      createdAt: '2026-08-04T17:40:00+08:00',
+      customerName: '匿名用户',
+      sentiment: 'negative',
+      aiReply: '这次体验确实给您添堵了，我们已经排查打包封口和装袋流程，并会对同批次外卖做复检。若愿意联系门店，我们会补发或补偿。',
+      highlighted: true,
+      handled: false,
+      replyUrl: 'https://example.com/reviews/douyin/review-4',
+    },
+  ],
+}
+
+const chainBoard: ChainBoardData = {
+  comparedAt: '2026-08-05T08:10:00+08:00',
+  periodLabel: '2026-07-07 至 2026-08-05',
+  stores: [
+    {
+      shopId: 3001,
+      shopName: '老王快餐（幸福路店）',
+      revenue: 3680,
+      profit: 1120,
+      growth: 12,
+      grossMargin: 55,
+      orderCount: 102,
+      pendingOrders: 2,
+      unhandledBadReviews: 1,
+      status: 'warning',
+      alerts: ['叶菜损耗偏高', '1条差评待回复'],
+      ranking: 1,
+    },
+    {
+      shopId: 3002,
+      shopName: '老王快餐（长宁店）',
+      revenue: 3210,
+      profit: 980,
+      growth: 8,
+      grossMargin: 54,
+      orderCount: 96,
+      pendingOrders: 0,
+      unhandledBadReviews: 0,
+      status: 'success',
+      alerts: ['经营平稳'],
+      ranking: 2,
+    },
+    {
+      shopId: 3003,
+      shopName: '轻食实验室（静安店）',
+      revenue: 2550,
+      profit: 620,
+      growth: -6,
+      grossMargin: 44,
+      orderCount: 74,
+      pendingOrders: 3,
+      unhandledBadReviews: 2,
+      status: 'danger',
+      alerts: ['新品退单率偏高', '复购率偏低'],
+      ranking: 3,
+    },
+  ],
+  actions: ['统一下发雨天外卖包装升级', '统一复制午市加购模板', '为静安店暂停高补贴新品券'],
+}
+
+const systemConfig3001: SystemConfigData = {
+  dataSources: [
+    { name: '美团订单', mode: 'OAuth 接入', status: 'success', lastSync: '08:00' },
+    { name: '饿了么订单', mode: 'OAuth 接入', status: 'success', lastSync: '07:58' },
+    { name: '抖音团购', mode: 'RPA 同步', status: 'warning', lastSync: '07:35' },
+    { name: '库存系统', mode: 'API 直连', status: 'success', lastSync: '08:01' },
+  ],
+  employees: [
+    { id: 1, name: '老王', role: '老板', shift: '全时段', permissionLevel: '全部菜单与导出权限' },
+    { id: 2, name: '小刘', role: '店长', shift: '午市 + 晚市', permissionLevel: '采购、日报、评价' },
+    { id: 3, name: '阿梅', role: '收银', shift: '午市', permissionLevel: '客户与收银看板' },
+    { id: 4, name: '阿强', role: '后厨', shift: '晚市', permissionLevel: '采购确认与库存' },
+  ],
+  dishes: [
+    { id: 101, name: '酸菜鱼', category: '主菜', status: '在售', price: 38, grossMargin: 68 },
+    { id: 102, name: '红烧肉饭', category: '套餐', status: '在售', price: 26, grossMargin: 54 },
+    { id: 103, name: '青椒土豆丝', category: '小炒', status: '待优化', price: 18, grossMargin: 28 },
+    { id: 104, name: '酸梅汤', category: '饮品', status: '在售', price: 8, grossMargin: 75 },
+  ],
+  suppliers: [
+    { id: 1, name: 'A供应商', category: '肉类 / 冷链', priceScore: '8.2', qualityScore: '9.4', status: '稳定合作' },
+    { id: 2, name: 'B供应商', category: '蔬菜 / 耗材', priceScore: '9.1', qualityScore: '8.3', status: '价格优势' },
+    { id: 3, name: 'C供应商', category: '腌菜 / 干货', priceScore: '8.0', qualityScore: '8.8', status: '补货灵活' },
+  ],
+  knowledgeBase: [
+    { id: 'kb-1', title: '酸菜鱼标准出餐卡', type: '菜品知识库', updatedAt: '2026-08-03' },
+    { id: 'kb-2', title: '常见差评回复模板', type: 'FAQ', updatedAt: '2026-08-02' },
+    { id: 'kb-3', title: '供应商异常处理 SOP', type: 'SOP', updatedAt: '2026-07-30' },
+  ],
+  exportLogs: [],
+  permissions: [
+    { role: '老板', scope: ['全部数据', '导出', '权限配置'] },
+    { role: '店长', scope: ['经营日报', '采购单', '评价回复'] },
+    { role: '后厨', scope: ['采购确认', '库存查看'] },
+    { role: '收银', scope: ['客户标签', '会员操作'] },
+  ],
+}
+
+function scaledDashboard(base: DashboardData, overrides: Partial<DashboardData>): DashboardData {
+  return {
+    ...base,
+    ...overrides,
+  }
+}
+
+function scaleCustomers(
+  customers: CustomerProfile[],
+  offset: number,
+  spendRatio: number,
+  averageDelta: number,
+  statusOverride?: string[],
+): CustomerProfile[] {
+  return customers.map((customer, index) => ({
+    ...customer,
+    id: customer.id + offset,
+    totalSpend: Number((customer.totalSpend * spendRatio).toFixed(0)),
+    totalOrders: Math.max(8, customer.totalOrders - 3 + index),
+    averageTicket: Number((customer.averageTicket + averageDelta).toFixed(1)),
+    statusLabels: index === 0 && statusOverride ? statusOverride : customer.statusLabels,
+  }))
+}
+
+function cloneDishQuadrant(period: number, titleHint: string): DishQuadrantData {
+  return {
+    ...dishQuadrant3001,
+    period,
+    suggestions: dishQuadrant3001.suggestions.map((item, index) =>
+      index === 0 ? `${item}（${titleHint}）` : item,
+    ),
+  }
+}
+
+function clonePurchaseOrder(
+  shopId: number,
+  status: PurchaseOrderData['status'],
+  totalAmountDelta: number,
+): PurchaseOrderData {
+  return {
+    ...purchaseOrder3001,
+    id: `PO-20260806-${shopId}`,
+    totalAmount: Number((purchaseOrder3001.totalAmount + totalAmountDelta).toFixed(1)),
+    status,
+    items: purchaseOrder3001.items.map((item, index) => ({
+      ...item,
+      id: `${item.id}-${shopId}`,
+      suggestedQty: Number((item.suggestedQty * (shopId === 3002 ? 0.88 : 0.76)).toFixed(1)),
+      amount: Number((item.amount * (shopId === 3002 ? 0.88 : 0.76)).toFixed(1)),
+      supplier: item.supplierOptions[index % item.supplierOptions.length] ?? item.supplier,
+    })),
+  }
+}
+
+const customers3002 = scaleCustomers(customers3001, 100, 0.82, -2.4)
+const customers3003 = scaleCustomers(customers3001, 200, 0.61, 1.3, ['价格敏感', '待召回'])
+
+const reviews3002 = {
+  ...reviews3001,
+  reviews: reviews3001.reviews.map((review, index) => ({
+    ...review,
+    id: `${review.id}-3002`,
+    platform: index % 2 === 0 ? '美团' : '饿了么',
+    createdAt: `2026-08-0${Math.min(5, index + 2)}T10:10:00+08:00`,
+  })),
+} satisfies ReviewAggregateData
+
+const reviews3003 = {
+  ...reviews3001,
+  reviews: reviews3001.reviews.map((review, index) => ({
+    ...review,
+    id: `${review.id}-3003`,
+    platform: index % 2 === 0 ? '抖音' : '大众点评',
+    highlighted: index !== 1,
+    createdAt: `2026-08-0${Math.min(5, index + 1)}T11:20:00+08:00`,
+  })),
+} satisfies ReviewAggregateData
+
+const systemConfig3002: SystemConfigData = {
+  ...systemConfig3001,
+}
+
+const systemConfig3003: SystemConfigData = {
+  ...systemConfig3001,
+  dataSources: systemConfig3001.dataSources.map((source, index) =>
+    index === 2 ? { ...source, status: 'danger', lastSync: '07:12' } : source,
+  ),
+}
+
+async function main() {
+  await prisma.voiceQuestionLog.deleteMany()
+  await prisma.exportLog.deleteMany()
+  await prisma.inventoryTransaction.deleteMany()
+  await prisma.inventoryItem.deleteMany()
+  await prisma.inventoryActionLog.deleteMany()
+  await prisma.couponSendLog.deleteMany()
+  await prisma.todoState.deleteMany()
+  await prisma.review.deleteMany()
+  await prisma.purchaseOrder.deleteMany()
+  await prisma.dishQuadrantSnapshot.deleteMany()
+  await prisma.customerProfileSnapshot.deleteMany()
+  await prisma.dailyReportSnapshot.deleteMany()
+  await prisma.dashboardSnapshot.deleteMany()
+  await prisma.systemConfigSnapshot.deleteMany()
+  await prisma.chainBoardSnapshot.deleteMany()
+  await prisma.shop.deleteMany()
+
+  await prisma.shop.createMany({
+    data: shops.map((shop) => ({ ...shop })),
+  })
+
+  await prisma.dashboardSnapshot.create({
+    data: {
+      shopId: 3001,
+      payload: dashboard3001,
+      lastSyncAt: new Date(dashboard3001.lastSyncAt),
+    },
+  })
+
+  await prisma.dashboardSnapshot.create({
+    data: {
+      shopId: 3002,
+      payload: scaledDashboard(dashboard3001, {
+        operationLabel: '今日经营正常',
+        operationTone: 'success',
+        profit: 980,
+        revenue: 3210,
+        orders: 96,
+        averageTicket: 33.4,
+        profitDelta: 8,
+        aiHeadline: '日报已发送',
+        aiSummary: '晚餐时段转化稳定，适合继续推双人套餐。',
+        reportHasAlert: false,
+        todos: [],
+        lastSyncAt: '2026-08-05T08:05:00+08:00',
+      }),
+      lastSyncAt: new Date('2026-08-05T08:05:00+08:00'),
+    },
+  })
+
+  await prisma.dashboardSnapshot.create({
+    data: {
+      shopId: 3003,
+      payload: scaledDashboard(dashboard3001, {
+        weather: { condition: '晴', temperature: 32, tip: '高温天轻食与冷饮会更强，午后可推加购饮品。' },
+        operationLabel: '有3条异常待处理',
+        operationTone: 'danger',
+        profit: 620,
+        revenue: 2550,
+        orders: 74,
+        averageTicket: 34.5,
+        profitDelta: -6,
+        aiHeadline: '日报提醒',
+        aiSummary: '新品沙拉退单偏高，建议检查包装和口感说明。',
+        reportHasAlert: true,
+        quickEntries: [],
+        todos: [],
+        lastSyncAt: '2026-08-05T08:01:00+08:00',
+      }),
+      lastSyncAt: new Date('2026-08-05T08:01:00+08:00'),
+    },
+  })
+
+  await prisma.dailyReportSnapshot.create({
+    data: {
+      id: 'report-3001-2026-08-04',
+      shopId: 3001,
+      reportDate: new Date('2026-08-04T00:00:00+08:00'),
+      payload: dailyReport3001,
+    },
+  })
+
+  await prisma.dailyReportSnapshot.create({
+    data: {
+      id: 'report-3002-2026-08-04',
+      shopId: 3002,
+      reportDate: new Date('2026-08-04T00:00:00+08:00'),
+      payload: {
+        ...dailyReport3001,
+        summary: '长宁店昨天整体平稳，晚餐套餐转化不错，今天重点是稳住节奏继续做会员升级。',
+      },
+    },
+  })
+
+  await prisma.dailyReportSnapshot.create({
+    data: {
+      id: 'report-3003-2026-08-04',
+      shopId: 3003,
+      reportDate: new Date('2026-08-04T00:00:00+08:00'),
+      payload: {
+        ...dailyReport3001,
+        summary: '静安店新品和补贴压缩了利润，今天要优先收缩高补贴并检查包装问题。',
+      },
+    },
+  })
+
+  for (const customer of customers3001) {
+    await prisma.customerProfileSnapshot.create({
+      data: {
+        customerId: customer.id,
+        shopId: 3001,
+        name: customer.name,
+        payload: customer,
+      },
+    })
+  }
+
+  for (const customer of customers3002) {
+    await prisma.customerProfileSnapshot.create({
+      data: {
+        customerId: customer.id,
+        shopId: 3002,
+        name: customer.name,
+        payload: customer,
+      },
+    })
+  }
+
+  for (const customer of customers3003) {
+    await prisma.customerProfileSnapshot.create({
+      data: {
+        customerId: customer.id,
+        shopId: 3003,
+        name: customer.name,
+        payload: customer,
+      },
+    })
+  }
+
+  await prisma.dishQuadrantSnapshot.create({
+    data: {
+      id: 'dish-3001-30',
+      shopId: 3001,
+      period: 30,
+      payload: dishQuadrant3001,
+    },
+  })
+
+  await prisma.dishQuadrantSnapshot.create({
+    data: {
+      id: 'dish-3002-30',
+      shopId: 3002,
+      period: 30,
+      payload: cloneDishQuadrant(30, '长宁店午晚餐结构更稳'),
+    },
+  })
+
+  await prisma.dishQuadrantSnapshot.create({
+    data: {
+      id: 'dish-3003-30',
+      shopId: 3003,
+      period: 30,
+      payload: cloneDishQuadrant(30, '静安店需要收缩新品补贴'),
+    },
+  })
+
+  await prisma.purchaseOrder.create({
+    data: {
+      id: purchaseOrder3001.id,
+      shopId: 3001,
+      forecastDate: new Date(`${purchaseOrder3001.forecastDate}T00:00:00+08:00`),
+      basedOn: purchaseOrder3001.basedOn,
+      status: purchaseOrder3001.status,
+      confidence: purchaseOrder3001.confidence,
+      aiNote: purchaseOrder3001.aiNote,
+      expireAlert: purchaseOrder3001.expireAlert,
+      totalAmount: purchaseOrder3001.totalAmount,
+      payload: purchaseOrder3001,
+      baselinePayload: purchaseOrder3001,
+    },
+  })
+
+  const purchaseOrder3002 = clonePurchaseOrder(3002, '已确认', -180)
+  await prisma.purchaseOrder.create({
+    data: {
+      id: purchaseOrder3002.id,
+      shopId: 3002,
+      forecastDate: new Date(`${purchaseOrder3002.forecastDate}T00:00:00+08:00`),
+      basedOn: purchaseOrder3002.basedOn,
+      status: purchaseOrder3002.status,
+      confidence: purchaseOrder3002.confidence,
+      aiNote: purchaseOrder3002.aiNote,
+      expireAlert: purchaseOrder3002.expireAlert,
+      totalAmount: purchaseOrder3002.totalAmount,
+      payload: purchaseOrder3002,
+      baselinePayload: purchaseOrder3002,
+    },
+  })
+
+  const purchaseOrder3003 = clonePurchaseOrder(3003, '待确认', -320)
+  await prisma.purchaseOrder.create({
+    data: {
+      id: purchaseOrder3003.id,
+      shopId: 3003,
+      forecastDate: new Date(`${purchaseOrder3003.forecastDate}T00:00:00+08:00`),
+      basedOn: purchaseOrder3003.basedOn,
+      status: purchaseOrder3003.status,
+      confidence: purchaseOrder3003.confidence,
+      aiNote: purchaseOrder3003.aiNote,
+      expireAlert: purchaseOrder3003.expireAlert,
+      totalAmount: purchaseOrder3003.totalAmount,
+      payload: purchaseOrder3003,
+      baselinePayload: purchaseOrder3003,
+    },
+  })
+
+  for (const review of reviews3001.reviews) {
+    await prisma.review.create({
+      data: {
+        id: review.id,
+        shopId: 3001,
+        platform: review.platform,
+        rating: review.rating,
+        category: review.category,
+        content: review.content,
+        createdAt: new Date(review.createdAt),
+        customerName: review.customerName,
+        sentiment: review.sentiment,
+        aiReply: review.aiReply,
+        highlighted: review.highlighted,
+        handled: review.handled,
+        replyUrl: review.replyUrl,
+      },
+    })
+  }
+
+  for (const review of reviews3002.reviews) {
+    await prisma.review.create({
+      data: {
+        id: review.id,
+        shopId: 3002,
+        platform: review.platform,
+        rating: review.rating,
+        category: review.category,
+        content: review.content,
+        createdAt: new Date(review.createdAt),
+        customerName: review.customerName,
+        sentiment: review.sentiment,
+        aiReply: review.aiReply,
+        highlighted: review.highlighted,
+        handled: review.handled,
+        replyUrl: review.replyUrl,
+      },
+    })
+  }
+
+  for (const review of reviews3003.reviews) {
+    await prisma.review.create({
+      data: {
+        id: review.id,
+        shopId: 3003,
+        platform: review.platform,
+        rating: review.rating,
+        category: review.category,
+        content: review.content,
+        createdAt: new Date(review.createdAt),
+        customerName: review.customerName,
+        sentiment: review.sentiment,
+        aiReply: review.aiReply,
+        highlighted: review.highlighted,
+        handled: review.handled,
+        replyUrl: review.replyUrl,
+      },
+    })
+  }
+
+  await prisma.chainBoardSnapshot.create({
+    data: {
+      payload: chainBoard,
+      comparedAt: new Date(chainBoard.comparedAt),
+    },
+  })
+
+  await prisma.systemConfigSnapshot.create({
+    data: {
+      shopId: 3001,
+      payload: systemConfig3001,
+    },
+  })
+
+  await prisma.systemConfigSnapshot.create({
+    data: {
+      shopId: 3002,
+      payload: systemConfig3002,
+    },
+  })
+
+  await prisma.systemConfigSnapshot.create({
+    data: {
+      shopId: 3003,
+      payload: systemConfig3003,
+    },
+  })
+}
+
+main()
+  .then(async () => {
+    await prisma.$disconnect()
+  })
+  .catch(async (error) => {
+    console.error(error)
+    await prisma.$disconnect()
+    process.exit(1)
+  })

@@ -1,0 +1,109 @@
+{
+  "notice": "业务化演示材料；active资料从启动日生效，七天后失效；手动导入时请同步填写有效期。",
+  "documents": [
+    {
+      "file": "01-禾盛小馆采购与盘点工作单.md",
+      "title": "禾盛小馆采购与盘点工作单",
+      "category": "采购规范",
+      "version": "HS-CG-2026-03",
+      "sourceName": "王丽店长、赵师傅采购交接单（演示）",
+      "state": "active"
+    },
+    {
+      "file": "02-陈记鲜肉铺陈老板报价与配送约定.md",
+      "title": "陈记鲜肉铺陈老板报价与配送约定",
+      "category": "供应商说明",
+      "version": "CR-2026-04",
+      "sourceName": "王丽与陈建国订货确认记录（演示）",
+      "state": "active"
+    },
+    {
+      "file": "03-刘姐时蔬报价与缺货替换说明.md",
+      "title": "刘姐时蔬报价与缺货替换说明",
+      "category": "供应商说明",
+      "version": "LF-2026-02",
+      "sourceName": "赵师傅蔬菜订货登记（演示）",
+      "state": "active"
+    },
+    {
+      "file": "04-王店长牛肉在途与短斤复盘记录.md",
+      "title": "王丽店长牛肉在途与短斤复盘",
+      "category": "异常处理",
+      "version": "HS-FP-2026-02",
+      "sourceName": "王丽、赵师傅采购复盘（演示）",
+      "state": "active"
+    },
+    {
+      "file": "05-陈老板牛肉旧报价-已过期.md",
+      "title": "陈老板牛肉旧报价（过期）",
+      "category": "供应商说明",
+      "version": "CR-OLD",
+      "sourceName": "陈记鲜肉铺历史报价存档（演示）",
+      "state": "expired"
+    },
+    {
+      "file": "06-陈老板牛肉续约草案-尚未生效.md",
+      "title": "陈老板牛肉续约草案（未来）",
+      "category": "供应商说明",
+      "version": "CR-DRAFT",
+      "sourceName": "王丽保存的续约草案（演示）",
+      "state": "future"
+    },
+    {
+      "file": "07-后厨旧收货办法-已停用.md",
+      "title": "后厨旧收货办法（停用）",
+      "category": "异常处理",
+      "version": "HS-RECEIVE-OLD",
+      "sourceName": "赵师傅旧交接笔记（演示）",
+      "state": "archived"
+    },
+    {
+      "file": "08-桥东分店孙老板牛肉专属约定.md",
+      "title": "其他门店：桥东分店孙老板牛肉约定",
+      "category": "供应商说明",
+      "version": "SD-QD-01",
+      "sourceName": "桥东店专属订货登记（演示）",
+      "state": "other_shop"
+    },
+    {
+      "file": "09-周记粮油周老板米油报价.md",
+      "title": "周记粮油周老板米油报价",
+      "category": "供应商说明",
+      "version": "ZJ-2026-02",
+      "sourceName": "王丽米油询价登记（演示）",
+      "state": "active"
+    },
+    {
+      "file": "10-何记蛋品何老板鸡蛋报价.md",
+      "title": "何记蛋品何老板鸡蛋报价",
+      "category": "供应商说明",
+      "version": "HJ-2026-01",
+      "sourceName": "赵师傅蛋品规格确认单（演示）",
+      "state": "active"
+    },
+    {
+      "file": "11-吴记水产吴师傅鱼片报价.md",
+      "title": "吴记水产吴师傅鱼片报价",
+      "category": "供应商说明",
+      "version": "WJ-2026-03",
+      "sourceName": "王丽水产订货规格表（演示）",
+      "state": "active"
+    },
+    {
+      "file": "12-王丽采购报价与系统预算核对说明.md",
+      "title": "王丽采购报价与系统预算核对说明",
+      "category": "采购规范",
+      "version": "HS-PRICE-2026-01",
+      "sourceName": "王丽采购预算复核页（演示）",
+      "state": "active"
+    },
+    {
+      "file": "13-杨姐干货与许老板饮品订货登记.md",
+      "title": "杨姐干货与许老板饮品订货登记",
+      "category": "供应商说明",
+      "version": "HS-OTHER-2026-01",
+      "sourceName": "王丽调味品和饮品订货台账（演示）",
+      "state": "active"
+    }
+  ]
+}

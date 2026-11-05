@@ -1,0 +1,20 @@
+{
+  "notice": "验证当前关键词检索能否找到指定材料，不评价大模型回答。paraphrase用来观察措辞变化导致的漏检；漏检应如实记录。",
+  "cases": [
+    { "kind": "direct", "question": "陈老板牛后腿肉多少钱一公斤，几点截单？", "expectedFile": "02-陈记鲜肉铺陈老板报价与配送约定.md" },
+    { "kind": "direct", "question": "刘姐青菜上海青报价和缺货替换", "expectedFile": "03-刘姐时蔬报价与缺货替换说明.md" },
+    { "kind": "direct", "question": "周老板大米25kg整袋报价", "expectedFile": "09-周记粮油周老板米油报价.md" },
+    { "kind": "direct", "question": "何老板鸡蛋30个一托多少钱", "expectedFile": "10-何记蛋品何老板鸡蛋报价.md" },
+    { "kind": "direct", "question": "吴师傅黑鱼片一袋的规格和报价", "expectedFile": "11-吴记水产吴师傅鱼片报价.md" },
+    { "kind": "direct", "question": "杨姐酸菜一袋报价多少", "expectedFile": "13-杨姐干货与许老板饮品订货登记.md" },
+    { "kind": "direct", "question": "许老板酸梅汤原液一桶多少钱", "expectedFile": "13-杨姐干货与许老板饮品订货登记.md" },
+    { "kind": "direct", "question": "牛肉到货不足1.6kg，陈老板补送退款怎么处理", "expectedFile": "04-王店长牛肉在途与短斤复盘记录.md" },
+    { "kind": "direct", "question": "王丽牛肉38元系统预设价和46元供货报价区别", "expectedFile": "12-王丽采购报价与系统预算核对说明.md" },
+    { "kind": "direct", "question": "赵师傅新品咖喱鸡饭用料未配置，采购前怎么核对", "expectedFile": "01-禾盛小馆采购与盘点工作单.md" },
+    { "kind": "paraphrase", "question": "送来的肉缺斤短两，后厨该找谁补差？", "expectedFile": "04-王店长牛肉在途与短斤复盘记录.md" },
+    { "kind": "paraphrase", "question": "今天订晚了，明早开火前还能送到吗？", "expectedFile": "02-陈记鲜肉铺陈老板报价与配送约定.md" },
+    { "kind": "paraphrase", "question": "账上那批还在路上，会不会又买重了？", "expectedFile": "04-王店长牛肉在途与短斤复盘记录.md" },
+    { "kind": "paraphrase", "question": "给盖饭配的绿叶菜没货，能换另一种吗？", "expectedFile": "03-刘姐时蔬报价与缺货替换说明.md" },
+    { "kind": "paraphrase", "question": "蛋送来磕碎几个，这笔钱怎么对？", "expectedFile": "10-何记蛋品何老板鸡蛋报价.md" }
+  ]
+}

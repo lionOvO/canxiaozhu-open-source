@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fff0ea"/>
+      <stop offset="1" stop-color="#e9d3ff"/>
+    </linearGradient>
+    <linearGradient id="drink" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#92304d"/>
+      <stop offset="1" stop-color="#4a1831"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="240" rx="34" fill="url(#bg)"/>
+  <circle cx="62" cy="58" r="34" fill="#ff7a45" opacity=".13"/>
+  <circle cx="252" cy="184" r="48" fill="#6d2a5a" opacity=".12"/>
+  <path d="M120 70h80l-12 120c-2 16-14 25-28 25s-26-9-28-25L120 70Z" fill="#fff8ef"/>
+  <path d="M130 112h60l-8 73c-2 10-10 17-22 17s-20-7-22-17l-8-73Z" fill="url(#drink)"/>
+  <ellipse cx="160" cy="112" rx="32" ry="11" fill="#b94d65"/>
+  <path d="M184 46c-18 24-27 58-29 97" fill="none" stroke="#ffcf6b" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="145" cy="137" r="8" fill="#f6c7c7" opacity=".6"/>
+  <circle cx="174" cy="151" r="7" fill="#f6c7c7" opacity=".55"/>
+  <circle cx="158" cy="176" r="6" fill="#f6c7c7" opacity=".5"/>
+</svg>

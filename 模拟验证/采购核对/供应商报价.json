@@ -1,0 +1,187 @@
+{
+  "notice": "全部为场景演示报价，不代表真实供货商或市场价。用于导入演示库存和供应商档案，不修改生产采购算法的预设价格。有效期为初始化当日起7个自然日。",
+  "suppliers": [
+    {
+      "name": "陈记鲜肉铺",
+      "owner": "陈建国",
+      "alias": "陈老板",
+      "category": "鲜肉",
+      "legacyProfile": "鲜肉供应商",
+      "cutoff": "16:00",
+      "delivery": "次日07:30—08:00",
+      "freeDeliveryThreshold": 100,
+      "deliveryFee": 8,
+      "quotes": [
+        {
+          "ingredient": "牛肉",
+          "product": "鲜牛后腿肉",
+          "unit": "kg",
+          "unitPrice": 46,
+          "packQty": 0.5,
+          "minimumQty": 2
+        },
+        {
+          "product": "牛腩块",
+          "unit": "kg",
+          "unitPrice": 42,
+          "packQty": 1
+        },
+        {
+          "product": "牛肉碎",
+          "unit": "kg",
+          "unitPrice": 32,
+          "packQty": 1
+        }
+      ]
+    },
+    {
+      "name": "刘姐时蔬配送",
+      "owner": "刘芳",
+      "alias": "刘姐",
+      "category": "蔬菜",
+      "legacyProfile": "蔬菜供应商",
+      "cutoff": "18:00",
+      "delivery": "次日07:00—07:30",
+      "freeDeliveryThreshold": 60,
+      "deliveryFee": 6,
+      "quotes": [
+        {
+          "ingredient": "青菜",
+          "product": "上海青",
+          "unit": "kg",
+          "unitPrice": 4.8,
+          "packQty": 0.5,
+          "minimumQty": 0.5
+        },
+        {
+          "ingredient": "番茄",
+          "product": "番茄",
+          "unit": "kg",
+          "unitPrice": 6.2,
+          "packQty": 0.5,
+          "minimumQty": 0.5
+        },
+        {
+          "ingredient": "黄瓜",
+          "product": "黄瓜",
+          "unit": "kg",
+          "unitPrice": 4.5,
+          "packQty": 0.5,
+          "minimumQty": 0.5
+        }
+      ]
+    },
+    {
+      "name": "周记粮油行",
+      "owner": "周德明",
+      "alias": "周老板",
+      "category": "粮油",
+      "legacyProfile": "粮油供应商",
+      "cutoff": "17:00",
+      "delivery": "次日09:00—10:00",
+      "freeDeliveryThreshold": 200,
+      "deliveryFee": 10,
+      "quotes": [
+        {
+          "ingredient": "大米",
+          "product": "长粒香大米",
+          "unit": "kg",
+          "unitPrice": 3.5,
+          "packQty": 25,
+          "minimumQty": 25
+        },
+        {
+          "product": "大豆油",
+          "unit": "L",
+          "unitPrice": 9.6,
+          "packQty": 5,
+          "minimumQty": 5
+        }
+      ]
+    },
+    {
+      "name": "何记蛋品",
+      "owner": "何志平",
+      "alias": "何老板",
+      "category": "蛋品",
+      "legacyProfile": "蛋品供应商",
+      "cutoff": "17:30",
+      "delivery": "次日08:30—09:00",
+      "freeDeliveryThreshold": 100,
+      "deliveryFee": 5,
+      "quotes": [
+        {
+          "ingredient": "鸡蛋",
+          "product": "普通鲜鸡蛋",
+          "unit": "个",
+          "unitPrice": 0.85,
+          "packQty": 30,
+          "minimumQty": 30
+        }
+      ]
+    },
+    {
+      "name": "吴记水产",
+      "owner": "吴海涛",
+      "alias": "吴师傅",
+      "category": "水产",
+      "legacyProfile": "鲜鱼供应商",
+      "cutoff": "15:30",
+      "delivery": "次日07:00—07:30",
+      "freeDeliveryThreshold": 150,
+      "deliveryFee": 12,
+      "quotes": [
+        {
+          "ingredient": "鱼片",
+          "product": "去骨黑鱼片",
+          "unit": "kg",
+          "unitPrice": 26,
+          "packQty": 1,
+          "minimumQty": 2
+        }
+      ]
+    },
+    {
+      "name": "杨姐干货铺",
+      "owner": "杨桂英",
+      "alias": "杨姐",
+      "category": "调味品",
+      "legacyProfile": "调味供应商",
+      "cutoff": "16:30",
+      "delivery": "次日09:00—10:00",
+      "freeDeliveryThreshold": 80,
+      "deliveryFee": 5,
+      "quotes": [
+        {
+          "ingredient": "酸菜",
+          "product": "袋装酸菜",
+          "unit": "kg",
+          "unitPrice": 4.6,
+          "packQty": 1,
+          "minimumQty": 5
+        }
+      ]
+    },
+    {
+      "name": "许彬饮品原料行",
+      "owner": "许彬",
+      "alias": "许老板",
+      "category": "饮品原料",
+      "legacyProfile": "饮品供应商",
+      "cutoff": "17:00",
+      "delivery": "次日10:00—11:00",
+      "freeDeliveryThreshold": 100,
+      "deliveryFee": 6,
+      "quotes": [
+        {
+          "ingredient": "酸梅汤原液",
+          "product": "酸梅汤原液（5L/桶）",
+          "unit": "桶",
+          "unitPrice": 21,
+          "packQty": 1,
+          "minimumQty": 2
+        }
+      ]
+    }
+  ]
+}

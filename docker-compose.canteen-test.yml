@@ -1,0 +1,62 @@
+services:
+  canteen-backend-test:
+    build:
+      context: .
+      dockerfile: deploy/docker/backend.Dockerfile
+      args:
+        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+    container_name: canteen-backend-test
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      DATABASE_URL: file:/app/data/dev.db
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://203.0.113.10:18080}
+    expose:
+      - "3000"
+    volumes:
+      - canteen-test-db:/app/data
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"const http=require('node:http');const req=http.get('http://127.0.0.1:3000/api/v2/health',res=>{res.resume();process.exit(res.statusCode===200?0:1)});req.on('error',()=>process.exit(1));req.setTimeout(3000,()=>{req.destroy();process.exit(1)})\""]
+      interval: 20s
+      timeout: 5s
+      retries: 8
+      start_period: 60s
+    networks:
+      - canteen-test-net
+
+  canteen-web-test:
+    build:
+      context: .
+      dockerfile: deploy/docker/web.Dockerfile
+      args:
+        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+        PUBLIC_HOST: ${PUBLIC_HOST:-203.0.113.10}
+        PUBLIC_PORT: ${PUBLIC_PORT:-18080}
+    container_name: canteen-web-test
+    restart: unless-stopped
+    depends_on:
+      canteen-backend-test:
+        condition: service_healthy
+    ports:
+      - "${PUBLIC_PORT:-18080}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/healthz >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - canteen-test-net
+
+networks:
+  canteen-test-net:
+    name: canteen-test-net
+    driver: bridge
+
+volumes:
+  canteen-test-db:
+    name: canteen-test-db

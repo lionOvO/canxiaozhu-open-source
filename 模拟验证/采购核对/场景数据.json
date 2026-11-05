@@ -1,0 +1,251 @@
+{
+  "notice": "全部为虚构业务数据，仅供餐小助场景模拟；不是实际订单、合同或供应商承诺。销量按启动日相对生成。",
+  "scenarios": [
+    {
+      "id": "normal",
+      "shopId": 910101,
+      "title": "正常补货",
+      "days": 7,
+      "status": "completed",
+      "dishes": [
+        {
+          "name": "招牌牛肉饭",
+          "perDay": 10
+        }
+      ],
+      "stock": [
+        {
+          "ingredient": "牛肉",
+          "currentQty": 0.5
+        }
+      ],
+      "documents": "active",
+      "expectedCodes": [],
+      "expectedBeefQty": 1.8,
+      "question": "王店长准备明天采购。请核对牛肉建议量，查陈老板的牛肉报价、起订量、截单时间和配送费，区分系统预设价与供货价。",
+      "shopName": "禾盛小馆·幸福路店"
+    },
+    {
+      "id": "uncounted",
+      "shopId": 910102,
+      "title": "库存未盘点",
+      "days": 7,
+      "status": "completed",
+      "dishes": [
+        {
+          "name": "招牌牛肉饭",
+          "perDay": 10
+        }
+      ],
+      "stock": [
+        {
+          "ingredient": "牛肉",
+          "currentQty": 99,
+          "isCounted": false
+        }
+      ],
+      "documents": "active",
+      "expectedCodes": [
+        "UNCOUNTED_STOCK"
+      ],
+      "expectedBeefQty": 2.3,
+      "question": "赵师傅说牛肉账面99kg可能是上次录错，今天还没盘点。请核对明天采购，能不能直接按账面库存下单？",
+      "shopName": "禾盛小馆·河畔店"
+    },
+    {
+      "id": "missing-bom",
+      "shopId": 910103,
+      "title": "菜品用料缺失",
+      "days": 7,
+      "status": "completed",
+      "dishes": [
+        {
+          "name": "招牌牛肉饭",
+          "perDay": 10
+        },
+        {
+          "name": "新品咖喱鸡饭",
+          "perDay": 6
+        }
+      ],
+      "stock": [],
+      "documents": "active",
+      "expectedCodes": [
+        "MISSING_BOM"
+      ],
+      "expectedBeefQty": 2.3,
+      "question": "新品咖喱鸡饭这周卖了42份，赵师傅还没录用料。核对采购是否覆盖新品，能否直接推算鸡肉量？",
+      "shopName": "禾盛小馆·科创园店"
+    },
+    {
+      "id": "no-sales",
+      "shopId": 910104,
+      "title": "没有成交销量",
+      "days": 0,
+      "status": "completed",
+      "dishes": [],
+      "stock": [],
+      "documents": "active",
+      "expectedCodes": [
+        "NO_USABLE_DEMAND"
+      ],
+      "question": "王店长发现新城店采购建议为空。请核对：是不是明天真的不用买食材？",
+      "shopName": "禾盛小馆·新城店"
+    },
+    {
+      "id": "pending-only",
+      "shopId": 910105,
+      "title": "只有未成交订单",
+      "days": 7,
+      "status": "pending",
+      "dishes": [
+        {
+          "name": "招牌牛肉饭",
+          "perDay": 30
+        }
+      ],
+      "stock": [],
+      "documents": "active",
+      "expectedCodes": [
+        "NO_USABLE_DEMAND"
+      ],
+      "question": "文苑店有210份牛肉饭但订单还在待确认，采购建议为空。请核对订单状态，不能为了生成建议随意改成完成。",
+      "shopName": "禾盛小馆·文苑店"
+    },
+    {
+      "id": "in-transit",
+      "shopId": 910106,
+      "title": "在途避免重复采购",
+      "days": 7,
+      "status": "completed",
+      "dishes": [
+        {
+          "name": "招牌牛肉饭",
+          "perDay": 10
+        }
+      ],
+      "stock": [
+        {
+          "ingredient": "牛肉",
+          "currentQty": 0.5,
+          "inTransitQty": 1
+        }
+      ],
+      "documents": "active",
+      "expectedCodes": [
+        "IN_TRANSIT_DEDUCTED"
+      ],
+      "expectedBeefQty": 0.8,
+      "question": "陈老板上一笔牛肉还有1kg没送到，店里实盘0.5kg。请核对明天还要买多少，并查在途重复采购处理办法。",
+      "shopName": "禾盛小馆·城西店"
+    },
+    {
+      "id": "sufficient",
+      "shopId": 910107,
+      "title": "库存足够",
+      "days": 7,
+      "status": "completed",
+      "dishes": [
+        {
+          "name": "招牌牛肉饭",
+          "perDay": 10
+        }
+      ],
+      "stock": [
+        {
+          "ingredient": "牛肉",
+          "currentQty": 20
+        },
+        {
+          "ingredient": "大米",
+          "currentQty": 20
+        },
+        {
+          "ingredient": "青菜",
+          "currentQty": 20
+        }
+      ],
+      "documents": "active",
+      "expectedCodes": [],
+      "expectedBeefQty": 0,
+      "question": "赵师傅盘完牛肉、大米、青菜各20kg。请核对采购，解释为什么这次没有补货量。",
+      "shopName": "禾盛小馆·湖滨店"
+    },
+    {
+      "id": "short-old",
+      "shopId": 910108,
+      "title": "样本短与旧盘点",
+      "days": 2,
+      "status": "completed",
+      "dishes": [
+        {
+          "name": "招牌牛肉饭",
+          "perDay": 10
+        }
+      ],
+      "stock": [
+        {
+          "ingredient": "牛肉",
+          "currentQty": 1,
+          "countAgeDays": 10
+        }
+      ],
+      "documents": "active",
+      "expectedCodes": [
+        "SHORT_HISTORY",
+        "OLD_COUNT"
+      ],
+      "expectedBeefQty": 1.3,
+      "question": "南苑店只有两天销量，牛肉盘点记录还是十天前。请核对补货建议，提醒王店长哪些依据不够可靠。",
+      "shopName": "禾盛小馆·南苑店"
+    },
+    {
+      "id": "unit-mismatch",
+      "shopId": 910109,
+      "title": "库存单位错误",
+      "days": 7,
+      "status": "completed",
+      "dishes": [
+        {
+          "name": "招牌牛肉饭",
+          "perDay": 10
+        }
+      ],
+      "stock": [
+        {
+          "ingredient": "牛肉",
+          "unit": "箱",
+          "currentQty": 3,
+          "inTransitQty": 1
+        }
+      ],
+      "documents": "active",
+      "expectedCodes": [
+        "UNIT_MISMATCH",
+        "UNCOUNTED_STOCK"
+      ],
+      "expectedBeefQty": 2.3,
+      "question": "陈老板的牛肉到货单写了3箱，库存也录成箱，用料是kg。请核对采购，能否拿3直接扣掉3kg？",
+      "shopName": "禾盛小馆·站前店"
+    },
+    {
+      "id": "invalid-docs",
+      "shopId": 910110,
+      "title": "资料失效与隔离",
+      "days": 7,
+      "status": "completed",
+      "dishes": [
+        {
+          "name": "招牌牛肉饭",
+          "perDay": 10
+        }
+      ],
+      "stock": [],
+      "documents": "invalid",
+      "expectedCodes": [],
+      "expectedBeefQty": 2.3,
+      "question": "东街店只留着陈老板旧报价和未生效续约草案。请核对采购，并查今天牛肉多少钱、几点截单，不能引用别家店的约定。",
+      "shopName": "禾盛小馆·东街店"
+    }
+  ]
+}
